@@ -5,33 +5,30 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
-#include <atomic>
-#include <climits>
 #include <iostream>
-#include <memory>
 #include <random>
 #include <thread>
 
 #define log(s) std::cout << #s << " : " << s << std::endl;
 
-constexpr size_t bufSize = 1'000'000;
-
+template<typename type>
 class Generator {
 public:
-    Generator();
+    Generator() : gen(rd()) { }
 
-    void addNoise(int R, int T, int M);
-    void writeBuf(int M, int var);
-    void stop();
+    type getVar(int R, int timeGenerate) {
+        std::uniform_int_distribution<type> distrVar(0, R);
+        std::uniform_int_distribution distrTime(0, timeGenerate);
+
+        int var = distrVar(gen);
+        log(var);
+        std::this_thread::sleep_for(std::chrono::milliseconds(distrTime(gen)));
+        return var;
+    }
 
 private:
-    std::atomic_bool flagProcessing{true};
-    std::unique_ptr<std::thread> thread;
     std::random_device rd;
     std::mt19937 gen;
-
-    int data[bufSize];
-    int counter{0};
 };
 
 #endif // GENERATOR_H

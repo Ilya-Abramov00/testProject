@@ -5,8 +5,8 @@
 class GeneratorTest : public testing::Test { };
 
 TEST_F(GeneratorTest, start) {
-    Generator generator;
-    generator.addNoise(25, 20, 6);
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-    generator.stop();
+    Generator<int> generator;
+    for(size_t i = 0; i != 10; i++) {
+        auto var = generator.getVar(20, 5);
+    }
 }
