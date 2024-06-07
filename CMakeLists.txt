@@ -7,26 +7,20 @@ set(CMAKE_CXX_STANDARD 17)
 set(UNITTEST ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY   ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/binaries)
-
 
 
 if(UNITTEST)
     add_subdirectory(googletests/)
-endif()
-
-
-add_subdirectory(libs/generator)
-
-
-
-if(UNITTEST)
     message(" output lib dir " ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG})
     enable_testing()
-
 endif()
+
+add_subdirectory(libs/generator)
+add_subdirectory(libs/database)
+add_subdirectory(libs/context)
 
 add_executable(testproject main.cpp)
 
+target_link_libraries(${PROJECT_NAME} PUBLIC  database generator)
 

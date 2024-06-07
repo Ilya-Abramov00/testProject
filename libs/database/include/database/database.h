@@ -2,8 +2,7 @@
 // Created by gts on 07.06.2024.
 //
 
-#ifndef GENERATOR_H
-#define GENERATOR_H
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -11,20 +10,25 @@
 #include <memory>
 #include <thread>
 
-#define log(s) std::cout << #s << " : " << s << std::endl;
-
 constexpr size_t bufSize = 1'000'000;
+struct Context;
 
 class DataBase {
 public:
-   DataBase(std::function<int(int, int)>&& getter_data) ;
+    DataBase(std::function<int(int, int)>&& getterData, std::function<const Context&()>&& getterParams,
+             std::function<void(int*, size_t)>&& dataWriter);
 
-    void addNoise(int R, int M);
-    void writeBuf(int M, int var);
+    void processing();
     void stop();
 
 private:
+    void writeBuf();
+    void checkParams();
+
     std::function<int(int, int)> getterData;
+    std::function<const Context&()> getterParams;
+    std::function<void(int*, size_t)> dataWriter;
+    const Context& params;
 
     std::atomic_bool flagProcessing{true};
     std::unique_ptr<std::thread> thread;
@@ -32,5 +36,3 @@ private:
     int data[bufSize];
     int counter{0};
 };
-
-#endif // GENERATOR_H
