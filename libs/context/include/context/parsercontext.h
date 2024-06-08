@@ -5,6 +5,7 @@
 
 #include "context.h"
 
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -12,11 +13,10 @@ class ParserContext {
 public:
     explicit ParserContext(std::string filename);
 
-    const Context& parseFile();
-
-    const Context& parseFileIfModification(size_t timeChecker);
+     Context parseFile();
+    bool fileIfModification();
 
 private:
     std::string filename;
-    Context params;
+    std::filesystem::file_time_type ftime;
 };

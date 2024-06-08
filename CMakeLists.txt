@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(testproject)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 set(UNITTEST ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -17,7 +17,7 @@ if(UNITTEST)
 endif()
 
 add_subdirectory(libs/generator)
-add_subdirectory(libs/database)
+add_subdirectory(libs/controller)
 add_subdirectory(libs/context)
 add_subdirectory(libs/parser)
 

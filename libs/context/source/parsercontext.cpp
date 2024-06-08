@@ -3,13 +3,20 @@
 #include "parser/configuration.h"
 #include "parser/xmlconfig.h"
 
+#include <filesystem>
+#include <format>
+#include <iostream>
+
 ParserContext::ParserContext(std::string filename) : filename(std::move(filename)) { }
 
-const Context& ParserContext::parseFile() {
+Context ParserContext::parseFile() {
     XmlConfigSettings xmlConfig;
+    ftime = std::filesystem::last_write_time(filename.c_str());
 
     auto cfg = xmlConfig.ConfigurationByFileName(filename.data());
     Configuration configuration(cfg);
+
+    Context params;
 
     params.generateRangeValue = configuration.getProperty<int>("R");
     params.stopCounterValue   = configuration.getProperty<int>("M");
@@ -17,6 +24,11 @@ const Context& ParserContext::parseFile() {
     params.generateTime       = configuration.getProperty<int>("generateTime");
     return params;
 }
-const Context& ParserContext::parseFileIfModification(size_t timeChecker) {
-    return parseFile();
+bool ParserContext::fileIfModification() {
+    if(ftime != std::filesystem::last_write_time(filename.c_str())) {
+        std::cout << std::format("File has been changed ", ftime);
+        return true;
+    }
+
+    return false;
 }

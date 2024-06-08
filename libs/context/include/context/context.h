@@ -20,6 +20,7 @@ private:
 std::ostream& operator<<(std::ostream& os, Context const& m) {
     return os << "R = " << m.generateTime << "\n"
               << "T = " << m.stopTimer << "\n"
-              <<"M = " << m.stopCounterValue << "\n"
+              << "M = " << m.stopCounterValue << "\n"
+              << "generateTime = " << m.generateTime << "\n"
               << std::endl;
 }

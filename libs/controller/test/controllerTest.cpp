@@ -1,4 +1,4 @@
-#include "database/database.h"
+#include "controller/controller.h"
 
 #include "context/context.h"
 #include "context/parsercontext.h"
@@ -27,14 +27,24 @@ TEST_F(DataBaseTest, start) {
         logQ(value);
         return value;
     };
-    auto getterParams = [this]() -> const Context& {
+
+    auto getterParams = [this]() -> Context {
         std::cout << params;
         return params;
     };
-    auto dataWritter = [](int*, size_t) {
+
+    auto dataWritter = [this](int*, size_t M) {
+        ASSERT_EQ(params.stopCounterValue, M);
     };
-    DataBase controller(std::move(getterData), std::move(getterParams), std::move(dataWritter));
-    controller.processing();
+
+    auto checkerParamsModification = []() -> bool {
+        return false;
+    };
+
+    Controller controller(std::move(getterData), std::move(getterParams), std::move(checkerParamsModification),
+                        std::move(dataWritter));
+
+    controller.start();
     std::this_thread::sleep_for(std::chrono::seconds(4));
     controller.stop();
 }
