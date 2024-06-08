@@ -1,6 +1,7 @@
 #include "database/database.h"
 
 #include "context/context.h"
+#include "context/parsercontext.h"
 #include "generator/generator.h"
 
 #include <gtest/gtest.h>
@@ -9,15 +10,17 @@
 
 class DataBaseTest : public testing::Test {
 public:
+    DataBaseTest() : fileName("params.xml"), parserContext(fileName) { }
+
+public:
     Generator<int> generator;
     Context params;
+    std::string fileName;
+    ParserContext parserContext;
 };
 
 TEST_F(DataBaseTest, start) {
-    params.generateRangeValue = 30;
-    params.generateTime       = 100;
-    params.stopCounterValue   = 50;
-    params.stopTimer          = 500;
+    params = parserContext.parseFile();
 
     auto getterData = [this](int, int) {
         auto value = generator.getVar(params.generateRangeValue, params.generateTime);
@@ -25,6 +28,7 @@ TEST_F(DataBaseTest, start) {
         return value;
     };
     auto getterParams = [this]() -> const Context& {
+        std::cout << params;
         return params;
     };
     auto dataWritter = [](int*, size_t) {

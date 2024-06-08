@@ -15,6 +15,11 @@
 
 class Configuration {
 public:
+    class NotFoundException : public std::runtime_error {
+    public:
+        NotFoundException(const std::string& error) : std::runtime_error("Property not found: " + error) { }
+    };
+
     Configuration(const std::map<std::string, std::string>& conf) : conf(conf) { }
 
     ~Configuration() { }

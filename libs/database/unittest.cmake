@@ -16,5 +16,6 @@ if(UNITTEST AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 	if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/test/config/conf.cmake)
 		include(${CMAKE_CURRENT_SOURCE_DIR}/test/config/conf.cmake)
+				message("configure test")
 	endif()
 endif()

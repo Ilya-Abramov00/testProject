@@ -3,9 +3,7 @@
 #include <QString>
 #include <iostream>
 
-std::map<std::string, std::string> XmlConfigSettings::ConfigurationByName(const QString& name) {
-    return ConfigurationByFileName(name + ".xml");
-}
+
 std::map<std::string, std::string> XmlConfigSettings::ConfigurationByFileName(const QString& name) {
     QString filename(dirsetting.absolutePath() + QDir::separator() + name);
     std::map<std::string, std::string> m;
@@ -39,13 +37,4 @@ void XmlConfigSettings::add2map(const QXmlStreamAttributes& a, std::map<std::str
     using namespace std;
     foreach(QXmlStreamAttribute attr, a)
         m.insert(pair<string, string>(attr.name().toString().toStdString(), attr.value().toString().toStdString()));
-}
-bool XmlConfigSettings::isValid(const QString& file) {
-    r.clear();
-    currfile.setFileName(dirsetting.absolutePath() + QDir::separator() + file);
-    if(!currfile.exists() || !currfile.open(QFile::ReadOnly | QFile::Text)) {
-        return false;
-    }
-    r.setDevice(&currfile);
-    return true;
 }
