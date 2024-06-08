@@ -49,4 +49,6 @@ private:
 
     int generateRangaValue;
     int generateTime;
+
+    std ::chrono::system_clock::time_point startTime;
 };

@@ -32,6 +32,7 @@ void Controller::stop() {
 void Controller::processingWriteBuf() {
     generateRangaValue = params.generateRangeValue;
     generateTime       = params.generateValueTime;
+    startTime          = std::chrono::system_clock::now();
 
     threadWriteBuf = std::make_unique<std::thread>([this]() {
         while(flagProcessing) {
@@ -47,9 +48,12 @@ void Controller::writeBuf() {
     generateRangaValue = params.generateRangeValue;
     generateTime       = params.generateValueTime;
 
-    if(params.stopCounterValue == counter) {
+    auto time
+        = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count();
+    if(params.stopCounterValue == counter && time > params.stopTimer) {
         senderData(bufDataGetter, counter);
-        counter = 0;
+        counter   = 0;
+        startTime = std::chrono::system_clock::now();
     };
 }
 

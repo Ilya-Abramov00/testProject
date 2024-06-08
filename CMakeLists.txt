@@ -11,7 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY   ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/binarie
 
 
 if(UNITTEST)
-    add_subdirectory(googletests/)
+    add_subdirectory(googletest/)
     message(" output lib dir " ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG})
     enable_testing()
 endif()
@@ -20,6 +20,9 @@ add_subdirectory(libs/generator)
 add_subdirectory(libs/controller)
 add_subdirectory(libs/context)
 add_subdirectory(libs/parser)
+add_subdirectory(libs/database)
+add_subdirectory(libs/hiberlite)
+
 
 add_executable(testproject main.cpp)
 
