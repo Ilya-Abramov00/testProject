@@ -18,10 +18,11 @@ Context ParserContext::parseFile() {
 
     Context params;
 
-    params.generateRangeValue = configuration.getProperty<int>("R");
-    params.stopCounterValue   = configuration.getProperty<int>("M");
-    params.stopTimer          = configuration.getProperty<int>("T");
-    params.generateTime       = configuration.getProperty<int>("generateTime");
+    params.generateRangeValue          = configuration.getProperty<int>("R");
+    params.stopCounterValue            = configuration.getProperty<int>("M");
+    params.stopTimer                   = configuration.getProperty<int>("T");
+    params.generateValueTime           = configuration.getProperty<int>("generateValueTime");
+    params.timeCheckModificationParams = configuration.getProperty<int>("timeCheckModificationParams");
     return params;
 }
 bool ParserContext::fileIfModification() {

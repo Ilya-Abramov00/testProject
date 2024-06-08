@@ -13,13 +13,12 @@
 #include <mutex>
 #include <thread>
 
-constexpr size_t bufSize     = 1'000'000;
-constexpr size_t timeCheckMs = 500;
+constexpr size_t bufSize = 1'000'000;
 
 class Controller {
 public:
     Controller(std::function<int(int, int)>&& getterData, std::function<Context()>&& getterParams,
-             std::function<bool()>&& checkerModificationData, std::function<void(int*, size_t)>&& dataWriter);
+               std::function<bool()>&& checkerModificationData, std::function<void(int*, size_t)>&& senderData);
 
     void start();
     void stop();
@@ -29,21 +28,25 @@ private:
     void processingGetParams();
 
     void writeBuf();
-    void validParams();
+    void validParams() const;
 
     std::function<int(int, int)> getterData;
     std::function<Context()> getterParams;
     std::function<bool()> checkerModificationParams;
-    std::function<void(int*, size_t)> dataWriter;
+    std::function<void(int*, size_t)> senderData;
 
     Context params;
 
-    std::atomic_bool flagProcessing{true};
+    bool flagProcessing{true};
     std::unique_ptr<std::thread> threadWriteBuf;
     std::unique_ptr<std::thread> threadGetParams;
 
-    int data[bufSize];
+    int bufDataGetter[bufSize];
+
     int counter{0};
 
     std::mutex mutex;
+
+    int generateRangaValue;
+    int generateTime;
 };

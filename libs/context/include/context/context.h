@@ -9,18 +9,20 @@
 struct Context {
 public:
     int generateRangeValue{}; // R
-    int stopTimer{};          // T
+    int generateValueTime{};
 
+    int stopTimer{};           // T
     size_t stopCounterValue{}; // M
 
-    int generateTime{};
+    int timeCheckModificationParams{};
 
 private:
 };
 std::ostream& operator<<(std::ostream& os, Context const& m) {
-    return os << "R = " << m.generateTime << "\n"
+    return os << "R = " << m.generateRangeValue << "\n"
               << "T = " << m.stopTimer << "\n"
               << "M = " << m.stopCounterValue << "\n"
-              << "generateTime = " << m.generateTime << "\n"
+              << "generateTime = " << m.generateValueTime << "\n"
+              << "timeCheckModificationParams = " << m.timeCheckModificationParams << "\n"
               << std::endl;
 }

@@ -3,18 +3,18 @@
 //
 #include "controller/controller.h"
 
-constexpr int timeGenerate = 100;
-#define logQ(s) std::cout << #s << " : " << s << std::endl;
+#include <cstring>
 
 Controller::Controller(std::function<int(int, int)>&& _getterData, std::function<Context()>&& _getterParams,
-                   std::function<bool()>&& _checkerModificationData, std::function<void(int*, size_t)>&& _dataWriter) :
+                       std::function<bool()>&& _checkerModificationData,
+                       std::function<void(int*, size_t)>&& senderData) :
     getterData(std::move(_getterData)),
     getterParams(std::move(_getterParams)), checkerModificationParams(std::move(_checkerModificationData)),
-    dataWriter(std::move(_dataWriter)), params(getterParams()) {
+    senderData(std::move(senderData)), params(getterParams()) {
     validParams();
 }
 
-void Controller::validParams() {
+void Controller::validParams() const {
     if(params.stopCounterValue > bufSize) {
         throw std::runtime_error("very big rangeCounter");
     }
@@ -30,6 +30,9 @@ void Controller::stop() {
 }
 
 void Controller::processingWriteBuf() {
+    generateRangaValue = params.generateRangeValue;
+    generateTime       = params.generateValueTime;
+
     threadWriteBuf = std::make_unique<std::thread>([this]() {
         while(flagProcessing) {
             writeBuf();
@@ -38,10 +41,15 @@ void Controller::processingWriteBuf() {
 }
 
 void Controller::writeBuf() {
-    data[counter] = getterData(params.generateRangeValue, timeGenerate);
-    if(params.generateRangeValue == ++counter) {
+    bufDataGetter[counter++] = getterData(generateRangaValue, generateTime);
+
+    std::lock_guard<std::mutex> a(mutex);
+    generateRangaValue = params.generateRangeValue;
+    generateTime       = params.generateValueTime;
+
+    if(params.stopCounterValue == counter) {
+        senderData(bufDataGetter, counter);
         counter = 0;
-        dataWriter(data, params.stopCounterValue);
     };
 }
 
@@ -54,7 +62,7 @@ void Controller::processingGetParams() {
                     params = getterParams();
                     validParams();
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(timeCheckMs));
+                std::this_thread::sleep_for(std::chrono::milliseconds(params.timeCheckModificationParams));
             }
         } catch(std::runtime_error& er) {
             std::cerr << "invalid Params " << er.what();

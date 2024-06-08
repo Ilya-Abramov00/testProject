@@ -62,13 +62,6 @@ namespace StringParser {
 
     template<template<typename...> class C, typename U>
     typename item_return<C<U>>::type parse(std::string paramValue, std::string&& delim = ";", size_t maxCount = 0) {
-        //	auto split = [](const std::string& input, std::string&& del) -> std::vector<std::string> {
-        //		std::regex re(del);
-        //		std::sregex_token_iterator first{input.begin(), input.end(), re, -1}, last;
-        //		return {first, last};
-        //	};
-        //	auto digit = split(paramValue, std::move(delim));
-
         std::list<std::string> digit;
         size_t pos   = 0;
         size_t count = 0;

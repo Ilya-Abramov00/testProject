@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <properties>
-    <prop R=                      "100" />
-    <prop M=                      "50" />
-    <prop N=                      "20" />
-    <prop T=                      "300" />
-    <prop G=                      "A" />
-    <prop generateTime=           "100" />
-
+    <prop R=                          "100" />
+    <prop M=                          "50" />
+    <prop N=                          "20" />
+    <prop T=                          "300" />
+    <prop G=                          "A" />
+    <prop generateValueTime=          "100" />
+    <prop timeCheckModificationParams="50"/>
 </properties>
 
