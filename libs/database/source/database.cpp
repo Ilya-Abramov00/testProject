@@ -8,10 +8,10 @@
 constexpr int timeGenerate = 100;
 #define logQ(s) std::cout << #s << " : " << s << std::endl;
 
-DataBase::DataBase(std::function<int(int, int)>&& _getterData, std::function<const Context&()>&& _getterParams,
+DataBase::DataBase(std::function<int(int, int)>&& _getterData, std::function<const Context&()>&& getterParams,
                    std::function<void(int*, size_t)>&& _dataWriter) :
     getterData(std::move(_getterData)),
-    getterParams(std::move(_getterParams)), dataWriter(std::move(_dataWriter)), params(getterParams()) { }
+    dataWriter(std::move(_dataWriter)), params(getterParams()) { }
 
 void DataBase::processing() {
     thread = std::make_unique<std::thread>([this]() {

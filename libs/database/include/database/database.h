@@ -26,7 +26,6 @@ private:
     void checkParams();
 
     std::function<int(int, int)> getterData;
-    std::function<const Context&()> getterParams;
     std::function<void(int*, size_t)> dataWriter;
     const Context& params;
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<properties>
+    <prop R=           "100" />
+    <prop M=           "50" />
+    <prop N=           "20" />
+    <prop T=           "300" />
+    <prop G=           "A" />
+</properties>
+

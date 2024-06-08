@@ -19,6 +19,7 @@ endif()
 add_subdirectory(libs/generator)
 add_subdirectory(libs/database)
 add_subdirectory(libs/context)
+add_subdirectory(libs/parser)
 
 add_executable(testproject main.cpp)
 
