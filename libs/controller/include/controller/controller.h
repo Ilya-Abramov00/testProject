@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "collector.h"
 #include "context/context.h"
 
+#include <array>
 #include <atomic>
 #include <functional>
 #include <iostream>
@@ -13,12 +15,11 @@
 #include <mutex>
 #include <thread>
 
-constexpr size_t bufSize = 1'000'000;
-
 class Controller {
 public:
     Controller(std::function<int(int, int)>&& getterData, std::function<Context()>&& getterParams,
-               std::function<bool()>&& checkerModificationData, std::function<void(int*, size_t)>&& senderData);
+               std::function<bool()>&& checkerModificationData,
+               std::function<void(int*, size_t)>&& senderData);
 
     void start();
     void stop();
@@ -26,20 +27,21 @@ public:
 private:
     void processingWriteBuf();
     void processingGetParams();
+    void processingSenderData();
 
     void writeBuf();
-    void validParams() const;
 
     std::function<int(int, int)> getterData;
     std::function<Context()> getterParams;
     std::function<bool()> checkerModificationParams;
-    std::function<void(int*, size_t)> senderData;
 
     Context params;
+    Collector collector;
 
     bool flagProcessing{true};
     std::unique_ptr<std::thread> threadWriteBuf;
     std::unique_ptr<std::thread> threadGetParams;
+    std::unique_ptr<std::thread> threadSenderData;
 
     int bufDataGetter[bufSize];
 

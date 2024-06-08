@@ -20,8 +20,9 @@ add_subdirectory(libs/generator)
 add_subdirectory(libs/controller)
 add_subdirectory(libs/context)
 add_subdirectory(libs/parser)
+add_subdirectory(libs/collector)
 add_subdirectory(libs/database)
-add_subdirectory(libs/hiberlite)
+add_subdirectory(libs/SQLiteCpp)
 
 
 add_executable(testproject main.cpp)

@@ -19,8 +19,9 @@ Context ParserContext::parseFile() {
     Context params;
 
     params.generateRangeValue          = configuration.getProperty<int>("R");
-    params.stopCounterValue            = configuration.getProperty<int>("M");
+    params.stopCounterValue            = configuration.getProperty<size_t>("M");
     params.stopTimer                   = configuration.getProperty<int>("T");
+    params.stopCounterArray            = configuration.getProperty<size_t>("N");
     params.generateValueTime           = configuration.getProperty<int>("generateValueTime");
     params.timeCheckModificationParams = configuration.getProperty<int>("timeCheckModificationParams");
     return params;

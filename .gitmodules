@@ -1,6 +1,6 @@
-[submodule "libs/hiberlite"]
-	path = libs/hiberlite
-	url = git@github.com:paulftw/hiberlite.git
 [submodule "googletest"]
 	path = googletest
 	url = git@github.com:google/googletest.git
+[submodule "libs/SQLiteCpp"]
+	path = libs/SQLiteCpp
+	url = git@github.com:Ilya-Abramov00/SQLiteCpp.git

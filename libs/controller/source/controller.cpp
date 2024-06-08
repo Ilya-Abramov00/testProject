@@ -7,26 +7,25 @@
 
 Controller::Controller(std::function<int(int, int)>&& _getterData, std::function<Context()>&& _getterParams,
                        std::function<bool()>&& _checkerModificationData,
-                       std::function<void(int*, size_t)>&& senderData) :
+                       std::function<void(int*, size_t)>&& _senderData) :
     getterData(std::move(_getterData)),
     getterParams(std::move(_getterParams)), checkerModificationParams(std::move(_checkerModificationData)),
-    senderData(std::move(senderData)), params(getterParams()) {
-    validParams();
+    params(getterParams()), collector(std::move(_senderData)) {
+    params.validParams();
 }
 
-void Controller::validParams() const {
-    if(params.stopCounterValue > bufSize) {
-        throw std::runtime_error("very big rangeCounter");
-    }
-}
 void Controller::start() {
+    flagProcessing = true;
     processingGetParams();
     processingWriteBuf();
+    processingSenderData();
 }
 void Controller::stop() {
     flagProcessing = false;
+    collector.stop();
     threadGetParams->join();
     threadWriteBuf->join();
+    threadSenderData->join();
 }
 
 void Controller::processingWriteBuf() {
@@ -51,7 +50,7 @@ void Controller::writeBuf() {
     auto time
         = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count();
     if(params.stopCounterValue == counter && time > params.stopTimer) {
-        senderData(bufDataGetter, counter);
+        collector.collectionData(bufDataGetter, counter, params.stopCounterArray);
         counter   = 0;
         startTime = std::chrono::system_clock::now();
     };
@@ -64,7 +63,7 @@ void Controller::processingGetParams() {
                 if(checkerModificationParams()) {
                     std::lock_guard<std::mutex> a(mutex);
                     params = getterParams();
-                    validParams();
+                    params.validParams();
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(params.timeCheckModificationParams));
             }
@@ -72,4 +71,7 @@ void Controller::processingGetParams() {
             std::cerr << "invalid Params " << er.what();
         }
     });
+}
+void Controller::processingSenderData() {
+    threadSenderData = std::make_unique<std::thread>([this]() { collector.start(); });
 }

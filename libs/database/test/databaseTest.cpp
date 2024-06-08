@@ -8,4 +8,6 @@ class DataBaseTest : public testing::Test {
 public:
 };
 
-TEST_F(DataBaseTest, start) { }
+TEST_F(DataBaseTest, start) {
+    DataBase db;
+}
