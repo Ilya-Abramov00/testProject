@@ -18,8 +18,7 @@
 class Controller {
 public:
     Controller(std::function<int(int, int)>&& getterData, std::function<Context()>&& getterParams,
-               std::function<bool()>&& checkerModificationData,
-               std::function<void(int*, size_t)>&& senderData);
+               std::function<bool()>&& checkerModificationData, std::function<void(std::string_view)>&& senderData);
 
     void start();
     void stop();
@@ -43,7 +42,7 @@ private:
     std::unique_ptr<std::thread> threadGetParams;
     std::unique_ptr<std::thread> threadSenderData;
 
-    int bufDataGetter[bufSize];
+    std::vector<int> bufDataGetter;
 
     int counter{0};
 

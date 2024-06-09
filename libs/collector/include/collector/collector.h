@@ -9,48 +9,30 @@
 #include <condition_variable>
 #include <cstring>
 #include <functional>
+#include <iostream>
 #include <queue>
+#include <sstream>
 
 struct Collector {
 public:
-    explicit Collector(std::function<void(int*, size_t)>&& _senderData) :
-        senderData(std::move(_senderData)), flag(flag) { }
+    explicit Collector(std::function<void(std::string_view)>&& _senderData, size_t sizeStopArray) ;
 
-    void collectionData(int* data, size_t sizeData, const size_t sizeCollector) {
-        std::unique_lock<std::mutex> lk(mtx);
-        std::memcpy(buffer[counter], data, sizeData);
-        collector.push({buffer[counter], sizeData});
+    void collectionData(int* data, size_t sizeData, size_t sizeCollector);
 
-        ++counter %= bufCounter;
-
-        lk.unlock();
-        cv.notify_one();
-    }
-
-    void start() {
-        while(flag) {
-            std::unique_lock<std::mutex> lk(mtx);
-            cv.wait(lk, [this] { return (sizeStopCollector > collector.size()); });
-            auto data = collector.back();
-            senderData(data.pointer, data.size);
-        }
-    }
-    void stop() {
-        flag = false;
-    }
+    void start() ;
+    void stop() ;
+    ~Collector();
 
 private:
-    std::function<void(int*, size_t)> senderData;
+    void convertToString(int* data, size_t sizeData) ;
 
-    int buffer[bufCounter][bufSize];
-    struct Data {
-        int* pointer;
-        size_t size;
-    };
-    std::queue<Data> collector;
-
-    size_t counter{0};
+    std::function<void(std::string_view)> senderData;
     size_t sizeStopCollector{0};
+
+    std::vector<std::string> buffer;
+
+    std::queue<std::string_view> collector;
+
     bool flag = true;
     std::mutex mtx;
     std::condition_variable cv;

@@ -8,8 +8,9 @@ class DataBase {
 public:
     DataBase();
 
-    void writeData();
+    void writeData(std::string_view data);
 
 private:
     SQLite::Database db;
+    size_t id = 0;
 };

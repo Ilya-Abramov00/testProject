@@ -7,10 +7,11 @@
 
 Controller::Controller(std::function<int(int, int)>&& _getterData, std::function<Context()>&& _getterParams,
                        std::function<bool()>&& _checkerModificationData,
-                       std::function<void(int*, size_t)>&& _senderData) :
+                       std::function<void(std::string_view)>&& _senderData) :
     getterData(std::move(_getterData)),
     getterParams(std::move(_getterParams)), checkerModificationParams(std::move(_checkerModificationData)),
-    params(getterParams()), collector(std::move(_senderData)) {
+    params(getterParams()), collector(std::move(_senderData), params.stopCounterArray) {
+    bufDataGetter.reserve(bufCounter);
     params.validParams();
 }
 
@@ -41,7 +42,7 @@ void Controller::processingWriteBuf() {
 }
 
 void Controller::writeBuf() {
-    bufDataGetter[counter++] = getterData(generateRangaValue, generateTime);
+    bufDataGetter.emplace_back(getterData(generateRangaValue, generateTime));
 
     std::lock_guard<std::mutex> a(mutex);
     generateRangaValue = params.generateRangeValue;
@@ -49,9 +50,9 @@ void Controller::writeBuf() {
 
     auto time
         = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count();
-    if(params.stopCounterValue == counter && time > params.stopTimer) {
-        collector.collectionData(bufDataGetter, counter, params.stopCounterArray);
-        counter   = 0;
+    if(params.stopCounterValue == bufDataGetter.size() && time > params.stopTimer) {
+        collector.collectionData(bufDataGetter.data(), bufDataGetter.size(), params.stopCounterArray);
+        bufDataGetter.resize(0);
         startTime = std::chrono::system_clock::now();
     };
 }

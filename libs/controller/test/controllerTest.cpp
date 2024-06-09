@@ -8,8 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#define logQ(s) std::cout << #s << " : " << s << std::endl;
-
 class DataBaseTest : public testing::Test {
 public:
     DataBaseTest() : fileName("params.xml"), parserContext(fileName) { }
@@ -29,29 +27,27 @@ TEST_F(DataBaseTest, System) {
             throw std::runtime_error("проверка на корректность изменение параметров из другого потока не прошла");
         }
 
-        auto value = generator.getVar(R, generateTime);
-
-        logQ(value);
-        return value;
+        return generator.getVar(R, generateTime);
     };
 
     auto getterParams = [this]() -> Context {
-        params.generateRangeValue = generator.getVar(500, 10);
-        params.generateValueTime  = generator.getVar(50, 10);
-        params.stopCounterValue   = generator.getVar(500, 10);
-        params.stopTimer          = generator.getVar(1000, 10);
-        params.stopCounterArray   = generator.getVar(20, 10);
+        params.generateRangeValue          = generator.getVar(100, 0);
+        params.generateValueTime           = generator.getVar(25, 0);
+        params.stopCounterValue            = generator.getVar(bufSize, 0);
+        params.stopTimer                   = generator.getVar(500, 0);
+        params.stopCounterArray            = generator.getVar(bufCounter, 0);
+        params.timeCheckModificationParams = generator.getVar(600, 0);
 
         std::cout << "\n\n\n       PARAMS MODIFICATION \n" << params << std::endl;
         return params;
     };
 
-    auto dataWritter = [this](int* data, size_t M) {
-        db.writeData();
+    auto dataWritter = [this](std::string_view data) {
+        db.writeData(data);
     };
 
     auto checkerParamsModification = [this]() -> bool {
-        return (10 > generator.getVar(50, 10)); // случайно изменяем параметры в случайный момент времени
+        return (2 > generator.getVar(100, 0)); // случайно изменяем параметры в случайный момент времени
     };
 
     Controller controller(std::move(getterData), std::move(getterParams), std::move(checkerParamsModification),
@@ -59,5 +55,6 @@ TEST_F(DataBaseTest, System) {
 
     controller.start();
     std::this_thread::sleep_for(std::chrono::seconds(15));
+    std::cout << "SIGNAL STOP" << std::endl;
     controller.stop();
 }

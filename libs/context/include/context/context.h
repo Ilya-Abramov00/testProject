@@ -7,7 +7,7 @@
 #include <ostream>
 
 constexpr size_t bufSize    = 1'000;
-constexpr size_t bufCounter = 20;
+constexpr size_t bufCounter = 100;
 
 struct Context {
 public:
@@ -17,11 +17,11 @@ public:
     int stopTimer{};           // T
     size_t stopCounterValue{}; // M
 
-    size_t stopCounterArray{0}; // N
+    size_t stopCounterArray{}; // N
     int timeCheckModificationParams{};
 
     void validParams() const {
-        if(stopCounterValue > bufSize) {
+        if(stopCounterValue > bufSize || (stopCounterArray > bufCounter)) {
             throw std::runtime_error("very big rangeCounter");
         }
     }

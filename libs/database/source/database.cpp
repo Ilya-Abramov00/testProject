@@ -3,41 +3,33 @@
 //
 #include "database/database.h"
 
-#include "SQLiteCpp/SQLiteCppExport.h"
 #include "context/context.h"
 
-#include <vector>
+#include <iostream>
+#include <iterator>
 
 DataBase::DataBase() : db("DataBase.db", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE) {
-    db.exec("DROP TABLE IF EXISTS Generator_Values");
+    db.exec("DROP TABLE IF EXISTS generate");
 
-    std::string counterСolumn("");
-    std::string value = "value";
-    for(size_t i = 0; i != bufSize; i++) {
-        counterСolumn += "value INTEGER,";
-    }
-    counterСolumn += "value INTEGER)";
+    std::string typeData = "( value VARCHAR(" + std::to_string(bufSize) + std::string("))");
 
-    std::string a("CREATE TABLE Generator_Values (");
-    std::string res(a + counterСolumn);
-    db.exec(res.c_str());
+    db.exec("CREATE TABLE generate " + typeData);
 }
-void DataBase::writeData() {
+void DataBase::writeData(std::string_view data) {
     // Begin transaction
     SQLite::Transaction transaction(db);
 
     // Prepare query
-    SQLite::Statement query{db, "INSERT INTO Generator_Values (value) VALUES (?)"};
+    SQLite::Statement query{db, "INSERT INTO generate (value) VALUES (?)"};
 
     // Collection to save in database
-    std::vector<int> values{1, 2, 3};
 
-    for(const auto& v : values) {
-        query.bind(1, v);
-        query.exec();
-        query.reset();
-    }
+    query.bind(1, data.data());
+    query.exec();
+    query.reset();
 
     // Commit transaction
     transaction.commit();
+
+    std::cout << "WRITE BASE DATA " << ++id << std::endl;
 }
