@@ -14,7 +14,7 @@ public:
 
     std::string fileName;
     Generator<int> generator;
-    Context params;
+    Params params;
     ParserContext parserContext;
     DataBase db;
 };
@@ -23,38 +23,78 @@ TEST_F(DataBaseTest, System) {
     params = parserContext.parseFile();
 
     auto getterData = [this](int R, int generateTime) -> int {
-        if(R != params.generateRangeValue && generateTime != params.generateValueTime) {
+        if(R != params.context.generateRangeValue && generateTime != params.generateValueTime) {
             throw std::runtime_error("проверка на корректность изменение параметров из другого потока не прошла");
         }
 
         return generator.getVar(R, generateTime);
     };
 
-    auto getterParams = [this]() -> Context {
-        params.generateRangeValue          = generator.getVar(100, 0);
-        params.generateValueTime           = generator.getVar(25, 0);
-        params.stopCounterValue            = generator.getVar(bufSize, 0);
-        params.stopTimer                   = generator.getVar(500, 0);
-        params.stopCounterArray            = generator.getVar(bufCounter, 0);
-        params.timeCheckModificationParams = generator.getVar(600, 0);
+    auto getterParams = [this]() -> Params {
+        params.context.generateRangeValue  = generator.getVar(100, 20);
+        params.generateValueTime           = generator.getVar(30, 0);
+        params.context.stopCounterValue    = generator.getVar(bufSize, 0);
+        params.context.stopTimer           = generator.getVar(400, 0);
+        params.context.stopCounterArray    = generator.getVar(bufCounter, 0);
+        params.timeCheckModificationParams = generator.getVar(400, 0);
 
         std::cout << "\n\n\n       PARAMS MODIFICATION \n" << params << std::endl;
         return params;
     };
 
-    auto dataWritter = [this](std::string_view data) {
-        db.writeData(data);
+    auto dataWritter = [this](const char* data, Context context) {
+        db.writeData(data, context);
     };
 
     auto checkerParamsModification = [this]() -> bool {
-        return (2 > generator.getVar(100, 0)); // случайно изменяем параметры в случайный момент времени
+        return (6 > generator.getVar(150, 0)); // случайно изменяем параметры в случайный момент времени
     };
 
     Controller controller(std::move(getterData), std::move(getterParams), std::move(checkerParamsModification),
                           std::move(dataWritter));
 
     controller.start();
-    std::this_thread::sleep_for(std::chrono::seconds(15));
+    std::this_thread::sleep_for(std::chrono::seconds(30));
+    std::cout << "SIGNAL STOP" << std::endl;
+    controller.stop();
+}
+
+TEST_F(DataBaseTest, testSize) {
+    auto getterData = [this](int R, int generateTime) -> int {
+        if(R != params.context.generateRangeValue && generateTime != params.generateValueTime) {
+            throw std::runtime_error("проверка на корректность изменение параметров из другого потока не прошла");
+        }
+
+        return generator.getVar(R, generateTime);
+    };
+
+    auto getterParams = [this]() -> Params {
+        params.context.generateRangeValue  = generator.getVar(9, 20);
+        params.generateValueTime           = generator.getVar(30, 0);
+        params.context.stopCounterValue    = 5;
+        params.context.stopTimer           = 5000;
+        params.context.stopCounterArray    = 10;
+        params.timeCheckModificationParams = generator.getVar(400, 0);
+
+        std::cout << "\n\n\n       PARAMS MODIFICATION \n" << params << std::endl;
+        return params;
+    };
+
+    auto dataWritter = [this](const char* data, Context context) {
+        ASSERT_EQ(std::string(data).size(), params.context.stopCounterValue * 2);
+        ASSERT_EQ(context.stopCounterArray, params.context.stopCounterArray);
+        db.writeData(data, context);
+    };
+
+    auto checkerParamsModification = [this]() -> bool {
+        return (3 > generator.getVar(150, 0)); // случайно изменяем параметры в случайный момент времени
+    };
+
+    Controller controller(std::move(getterData), std::move(getterParams), std::move(checkerParamsModification),
+                          std::move(dataWritter));
+
+    controller.start();
+    std::this_thread::sleep_for(std::chrono::seconds(30));
     std::cout << "SIGNAL STOP" << std::endl;
     controller.stop();
 }

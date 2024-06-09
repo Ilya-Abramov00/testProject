@@ -15,25 +15,23 @@
 
 struct Collector {
 public:
-    explicit Collector(std::function<void(std::string_view)>&& _senderData, size_t sizeStopArray) ;
+    explicit Collector(std::function<void(const char*, Context)>&& _senderData, Context context);
 
-    void collectionData(int* data, size_t sizeData, size_t sizeCollector);
+    void collectionData(const int* data, size_t sizeData, Context context);
 
-    void start() ;
-    void stop() ;
-    ~Collector();
+    void start();
+    void stop();
 
 private:
-    void convertToString(int* data, size_t sizeData) ;
-
-    std::function<void(std::string_view)> senderData;
-    size_t sizeStopCollector{0};
+    std::function<void(const char*, Context)> senderData;
+    Context context;
 
     std::vector<std::string> buffer;
 
-    std::queue<std::string_view> collector;
+    std::queue<const char*> collector;
 
     bool flag = true;
     std::mutex mtx;
     std::condition_variable cv;
+    size_t counter{0};
 };

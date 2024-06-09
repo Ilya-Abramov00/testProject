@@ -17,8 +17,8 @@
 
 class Controller {
 public:
-    Controller(std::function<int(int, int)>&& getterData, std::function<Context()>&& getterParams,
-               std::function<bool()>&& checkerModificationData, std::function<void(std::string_view)>&& senderData);
+    Controller(std::function<int(int, int)>&& getterData, std::function<Params()>&& getterParams,
+               std::function<bool()>&& checkerModificationData, std::function<void(const char*, Context)>&& senderData);
 
     void start();
     void stop();
@@ -31,10 +31,10 @@ private:
     void writeBuf();
 
     std::function<int(int, int)> getterData;
-    std::function<Context()> getterParams;
+    std::function<Params()> getterParams;
     std::function<bool()> checkerModificationParams;
 
-    Context params;
+    Params params;
     Collector collector;
 
     bool flagProcessing{true};
@@ -51,5 +51,5 @@ private:
     int generateRangaValue;
     int generateTime;
 
-    std ::chrono::system_clock::time_point startTime;
+    std::chrono::system_clock::time_point startTime;
 };

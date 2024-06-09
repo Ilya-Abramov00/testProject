@@ -27,5 +27,5 @@ add_subdirectory(libs/SQLiteCpp)
 
 add_executable(testproject main.cpp)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC  database generator)
+target_link_libraries(${PROJECT_NAME} PUBLIC  context generator parser collector database controller)
 

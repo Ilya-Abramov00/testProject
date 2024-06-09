@@ -13,7 +13,7 @@ class ParserContext {
 public:
     explicit ParserContext(std::string filename);
 
-     Context parseFile();
+     Params parseFile();
     bool fileIfModification();
 
 private:

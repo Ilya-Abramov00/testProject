@@ -6,33 +6,33 @@
 #include <cstddef>
 #include <ostream>
 
-constexpr size_t bufSize    = 1'000;
+constexpr size_t bufSize    = 50;
 constexpr size_t bufCounter = 100;
 
 struct Context {
 public:
-    int generateRangeValue{}; // R
-    int generateValueTime{};
-
-    int stopTimer{};           // T
-    size_t stopCounterValue{}; // M
+    size_t generateRangeValue{}; // R
+    size_t stopTimer{};          // T
+    size_t stopCounterValue{};   // M
 
     size_t stopCounterArray{}; // N
-    int timeCheckModificationParams{};
-
     void validParams() const {
         if(stopCounterValue > bufSize || (stopCounterArray > bufCounter)) {
             throw std::runtime_error("very big rangeCounter");
         }
     }
-
-private:
 };
-std::ostream& operator<<(std::ostream& os, Context const& m) {
-    return os << "R = " << m.generateRangeValue << "\n"
-              << "T = " << m.stopTimer << "\n"
-              << "M = " << m.stopCounterValue << "\n"
-              << "N = " << m.stopCounterArray << "\n"
+struct Params {
+    Context context;
+    int generateValueTime{};
+    int timeCheckModificationParams{};
+};
+
+std::ostream& operator<<(std::ostream& os, Params const& m) {
+    return os << "R = " << m.context.generateRangeValue << "\n"
+              << "T = " << m.context.stopTimer << "\n"
+              << "M = " << m.context.stopCounterValue << "\n"
+              << "N = " << m.context.stopCounterArray << "\n"
               << "generateTime = " << m.generateValueTime << "\n"
               << "timeCheckModificationParams = " << m.timeCheckModificationParams << "\n"
               << std::endl;

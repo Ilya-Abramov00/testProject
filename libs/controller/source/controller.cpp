@@ -5,14 +5,14 @@
 
 #include <cstring>
 
-Controller::Controller(std::function<int(int, int)>&& _getterData, std::function<Context()>&& _getterParams,
+Controller::Controller(std::function<int(int, int)>&& _getterData, std::function<Params()>&& _getterParams,
                        std::function<bool()>&& _checkerModificationData,
-                       std::function<void(std::string_view)>&& _senderData) :
+                       std::function<void(const char*, Context)>&& _senderData) :
     getterData(std::move(_getterData)),
     getterParams(std::move(_getterParams)), checkerModificationParams(std::move(_checkerModificationData)),
-    params(getterParams()), collector(std::move(_senderData), params.stopCounterArray) {
+    params(getterParams()), collector(std::move(_senderData), params.context) {
     bufDataGetter.reserve(bufCounter);
-    params.validParams();
+    params.context.validParams();
 }
 
 void Controller::start() {
@@ -30,7 +30,7 @@ void Controller::stop() {
 }
 
 void Controller::processingWriteBuf() {
-    generateRangaValue = params.generateRangeValue;
+    generateRangaValue = params.context.generateRangeValue;
     generateTime       = params.generateValueTime;
     startTime          = std::chrono::system_clock::now();
 
@@ -45,13 +45,14 @@ void Controller::writeBuf() {
     bufDataGetter.emplace_back(getterData(generateRangaValue, generateTime));
 
     std::lock_guard<std::mutex> a(mutex);
-    generateRangaValue = params.generateRangeValue;
+    generateRangaValue = params.context.generateRangeValue;
     generateTime       = params.generateValueTime;
 
     auto time
         = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count();
-    if(params.stopCounterValue == bufDataGetter.size() && time > params.stopTimer) {
-        collector.collectionData(bufDataGetter.data(), bufDataGetter.size(), params.stopCounterArray);
+    if(params.context.stopCounterValue == bufDataGetter.size()
+       || (time > params.context.stopTimer && bufDataGetter.size())) {
+        collector.collectionData(bufDataGetter.data(), bufDataGetter.size(), params.context);
         bufDataGetter.resize(0);
         startTime = std::chrono::system_clock::now();
     };
@@ -64,7 +65,7 @@ void Controller::processingGetParams() {
                 if(checkerModificationParams()) {
                     std::lock_guard<std::mutex> a(mutex);
                     params = getterParams();
-                    params.validParams();
+                    params.context.validParams();
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(params.timeCheckModificationParams));
             }
